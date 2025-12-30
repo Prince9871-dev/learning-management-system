@@ -1,0 +1,155 @@
+.course-detail-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.course-detail-container {
+  flex: 1;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 2rem;
+}
+
+.course-detail-loading,
+.course-detail-error {
+  text-align: center;
+  padding: 4rem;
+  color: #7f8c8d;
+}
+
+.course-detail-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.course-detail-header {
+  margin-bottom: 1rem;
+}
+
+.course-detail-title {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #2c3e50;
+}
+
+.course-detail-meta {
+  display: flex;
+  gap: 1.5rem;
+  color: #7f8c8d;
+  font-size: 0.875rem;
+}
+
+.course-detail-video-section {
+  width: 100%;
+}
+
+.course-detail-description {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.course-detail-description h2 {
+  margin-bottom: 1rem;
+  color: #2c3e50;
+}
+
+.course-detail-description p {
+  color: #34495e;
+  line-height: 1.6;
+}
+
+.course-detail-sidebar {
+  position: sticky;
+  top: 2rem;
+  height: fit-content;
+}
+
+.course-detail-lessons {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.course-detail-lessons h3 {
+  padding: 1.5rem;
+  margin: 0;
+  background: #3498db;
+  color: white;
+  font-size: 1.25rem;
+}
+
+.course-detail-lessons-list {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.course-detail-lesson {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.course-detail-lesson:hover {
+  background: #f8f9fa;
+}
+
+.course-detail-lesson.active {
+  background: #e3f2fd;
+  border-left: 4px solid #3498db;
+}
+
+.course-detail-lesson-number {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #ecf0f1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #7f8c8d;
+}
+
+.course-detail-lesson.active .course-detail-lesson-number {
+  background: #3498db;
+  color: white;
+}
+
+.course-detail-lesson-info {
+  flex: 1;
+}
+
+.course-detail-lesson-title {
+  font-weight: 500;
+  color: #2c3e50;
+  margin-bottom: 0.25rem;
+}
+
+.course-detail-lesson-duration {
+  font-size: 0.875rem;
+  color: #7f8c8d;
+}
+
+@media (max-width: 1024px) {
+  .course-detail-container {
+    grid-template-columns: 1fr;
+  }
+
+  .course-detail-sidebar {
+    position: static;
+  }
+}
+

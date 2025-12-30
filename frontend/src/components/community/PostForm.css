@@ -1,0 +1,49 @@
+.post-form {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.post-form-title {
+  margin-bottom: 1rem;
+  color: #2c3e50;
+}
+
+.post-form-group {
+  margin-bottom: 1rem;
+}
+
+.post-form-input,
+.post-form-textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.post-form-input:focus,
+.post-form-textarea:focus {
+  border-color: #3498db;
+}
+
+.post-form-textarea {
+  resize: vertical;
+}
+
+.post-form-button {
+  background-color: #3498db;
+  color: white;
+  padding: 0.75rem 2rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+}
+
+.post-form-button:hover {
+  background-color: #2980b9;
+}
+

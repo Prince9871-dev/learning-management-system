@@ -1,0 +1,13 @@
+.course-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  padding: 2rem 0;
+}
+
+.course-list-empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #7f8c8d;
+}
+

@@ -1,0 +1,28 @@
+.ask-ai-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.ask-ai-container {
+  flex: 1;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+  width: 100%;
+}
+
+.ask-ai-header {
+  margin-bottom: 2rem;
+}
+
+.ask-ai-title {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: #2c3e50;
+}
+
+.ask-ai-subtitle {
+  color: #7f8c8d;
+}
+

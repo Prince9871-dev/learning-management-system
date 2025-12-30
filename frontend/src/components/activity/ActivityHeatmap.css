@@ -1,0 +1,72 @@
+.activity-heatmap {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.activity-heatmap-title {
+  margin-bottom: 1rem;
+  color: #2c3e50;
+}
+
+.activity-heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(53, 1fr);
+  gap: 2px;
+  margin-bottom: 1rem;
+}
+
+.activity-heatmap-day {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.activity-heatmap-day:hover {
+  transform: scale(1.2);
+}
+
+.activity-heatmap-day-none {
+  background: #ebedf0;
+}
+
+.activity-heatmap-day-low {
+  background: #c6e48b;
+}
+
+.activity-heatmap-day-medium {
+  background: #7bc96f;
+}
+
+.activity-heatmap-day-high {
+  background: #239a3b;
+}
+
+.activity-heatmap-day-very-high {
+  background: #196127;
+}
+
+.activity-heatmap-legend {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: #7f8c8d;
+}
+
+.activity-heatmap-legend-colors {
+  display: flex;
+  gap: 2px;
+}
+
+.activity-heatmap-legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
