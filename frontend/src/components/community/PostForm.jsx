@@ -4,7 +4,7 @@ import './PostForm.css'
 const PostForm = ({ onSubmit }) => {
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
-  const [tags, setTags] = useState('')
+  const [link, setLink] = useState('')
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -13,13 +13,13 @@ const PostForm = ({ onSubmit }) => {
     const postData = {
       title: title.trim(),
       content: content.trim(),
-      tags: tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+      link: link.trim() || null,
     }
 
     onSubmit(postData)
     setTitle('')
     setContent('')
-    setTags('')
+    setLink('')
   }
 
   return (
@@ -47,10 +47,10 @@ const PostForm = ({ onSubmit }) => {
       </div>
       <div className="post-form-group">
         <input
-          type="text"
-          placeholder="Tags (comma separated)"
-          value={tags}
-          onChange={(e) => setTags(e.target.value)}
+          type="url"
+          placeholder="Link (optional)"
+          value={link}
+          onChange={(e) => setLink(e.target.value)}
           className="post-form-input"
         />
       </div>

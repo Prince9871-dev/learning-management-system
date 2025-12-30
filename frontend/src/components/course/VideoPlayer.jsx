@@ -66,12 +66,23 @@ const VideoPlayer = ({ videoUrl, title, onProgress }) => {
   return (
     <div className="video-player">
       <div className="video-player-container">
-        <video
-          ref={videoRef}
-          src={videoUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'}
-          className="video-player-video"
-          onClick={togglePlay}
-        />
+        {videoUrl && videoUrl.includes('youtube.com/embed') ? (
+          <iframe
+            src={videoUrl}
+            className="video-player-video"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            style={{ width: '100%', height: '100%', minHeight: '400px' }}
+          />
+        ) : (
+          <video
+            ref={videoRef}
+            src={videoUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'}
+            className="video-player-video"
+            onClick={togglePlay}
+          />
+        )}
         <div className="video-player-controls">
           <button onClick={togglePlay} className="video-player-button">
             {isPlaying ? '⏸' : '▶'}

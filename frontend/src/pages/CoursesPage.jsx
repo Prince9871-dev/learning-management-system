@@ -2,82 +2,50 @@ import { useState, useEffect } from 'react'
 import Navbar from '../components/common/Navbar'
 import Footer from '../components/common/Footer'
 import CourseList from '../components/course/CourseList'
+import { courseAPI } from '../services/api'
 import './CoursesPage.css'
 
 const CoursesPage = () => {
   const [courses, setCourses] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
 
   useEffect(() => {
-    // Mock data - in real app, this would fetch from API
-    const mockCourses = [
-      {
-        id: '1',
-        title: 'Introduction to React',
-        description: 'Learn the fundamentals of React and build your first application.',
-        instructor: 'John Doe',
-        category: 'Web Development',
-        rating: 4.5,
-        duration: '10h 30m',
-        thumbnail: null,
-      },
-      {
-        id: '2',
-        title: 'Advanced JavaScript',
-        description: 'Master advanced JavaScript concepts and modern ES6+ features.',
-        instructor: 'Jane Smith',
-        category: 'Programming',
-        rating: 4.8,
-        duration: '15h 20m',
-        thumbnail: null,
-      },
-      {
-        id: '3',
-        title: 'Full Stack Development',
-        description: 'Build complete web applications from frontend to backend.',
-        instructor: 'Mike Johnson',
-        category: 'Web Development',
-        rating: 4.7,
-        duration: '25h 45m',
-        thumbnail: null,
-      },
-      {
-        id: '4',
-        title: 'Data Structures & Algorithms',
-        description: 'Master fundamental data structures and algorithms for technical interviews.',
-        instructor: 'Sarah Williams',
-        category: 'Computer Science',
-        rating: 4.9,
-        duration: '20h 15m',
-        thumbnail: null,
-      },
-      {
-        id: '5',
-        title: 'UI/UX Design Principles',
-        description: 'Learn design thinking and create beautiful user interfaces.',
-        instructor: 'Emily Davis',
-        category: 'Design',
-        rating: 4.6,
-        duration: '12h 30m',
-        thumbnail: null,
-      },
-      {
-        id: '6',
-        title: 'Python for Data Science',
-        description: 'Analyze data and build machine learning models with Python.',
-        instructor: 'David Brown',
-        category: 'Data Science',
-        rating: 4.7,
-        duration: '18h 40m',
-        thumbnail: null,
-      },
-    ]
+    const fetchCourses = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        const response = await courseAPI.getAll()
+        
+        // Backend returns: { success: true, courses: [...] }
+        if (response.data.success && response.data.courses) {
+          // Map backend course format to frontend format
+          const formattedCourses = response.data.courses.map(course => ({
+            id: course._id || course.id,
+            title: course.title,
+            description: course.description || '',
+            instructor: 'Instructor', // Backend doesn't provide instructor
+            category: 'Course', // Backend doesn't provide category
+            rating: 0, // Backend doesn't provide rating
+            duration: 'N/A', // Backend doesn't provide duration
+            thumbnail: null,
+            createdAt: course.createdAt,
+            notesUrl: course.notesUrl,
+          }))
+          setCourses(formattedCourses)
+        } else {
+          setError('Failed to load courses')
+        }
+      } catch (err) {
+        console.error('Error fetching courses:', err)
+        setError(err.response?.data?.error || 'Failed to load courses. Please try again.')
+      } finally {
+        setLoading(false)
+      }
+    }
 
-    setTimeout(() => {
-      setCourses(mockCourses)
-      setLoading(false)
-    }, 500)
+    fetchCourses()
   }, [])
 
   const filteredCourses = courses.filter((course) =>
@@ -104,6 +72,8 @@ const CoursesPage = () => {
 
         {loading ? (
           <div className="courses-loading">Loading courses...</div>
+        ) : error ? (
+          <div className="courses-error">{error}</div>
         ) : (
           <CourseList courses={filteredCourses} />
         )}

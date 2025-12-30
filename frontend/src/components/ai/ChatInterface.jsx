@@ -18,7 +18,7 @@ const ChatInterface = ({ onSendMessage }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!input.trim()) return
 
     const userMessage = {
@@ -28,22 +28,59 @@ const ChatInterface = ({ onSendMessage }) => {
       timestamp: new Date(),
     }
 
-    setMessages([...messages, userMessage])
+    const currentInput = input
+    setMessages(prev => [...prev, userMessage])
     setInput('')
 
-    // Simulate AI response
-    setTimeout(() => {
-      const aiMessage = {
-        id: Date.now() + 1,
-        text: 'I understand your question. This is a mock response. In a real implementation, this would connect to an AI service.',
-        sender: 'ai',
-        timestamp: new Date(),
-      }
-      setMessages(prev => [...prev, aiMessage])
+    // Show loading state
+    const loadingMessage = {
+      id: Date.now() + 1,
+      text: 'Thinking...',
+      sender: 'ai',
+      timestamp: new Date(),
+      loading: true,
+    }
+    setMessages(prev => [...prev, loadingMessage])
+
+    try {
+      // Call the onSendMessage callback which should return the AI response
       if (onSendMessage) {
-        onSendMessage(input)
+        const aiResponse = await onSendMessage(currentInput, setMessages, messages)
+        
+        // Remove loading message and add actual response
+        setMessages(prev => {
+          const withoutLoading = prev.filter(msg => !msg.loading)
+          return [...withoutLoading, {
+            id: Date.now() + 2,
+            text: aiResponse,
+            sender: 'ai',
+            timestamp: new Date(),
+          }]
+        })
+      } else {
+        // Fallback if no callback provided
+        setMessages(prev => {
+          const withoutLoading = prev.filter(msg => !msg.loading)
+          return [...withoutLoading, {
+            id: Date.now() + 2,
+            text: 'I understand your question. Please configure the AI API.',
+            sender: 'ai',
+            timestamp: new Date(),
+          }]
+        })
       }
-    }, 1000)
+    } catch (error) {
+      // Remove loading message and show error
+      setMessages(prev => {
+        const withoutLoading = prev.filter(msg => !msg.loading)
+        return [...withoutLoading, {
+          id: Date.now() + 2,
+          text: 'Sorry, I encountered an error. Please try again.',
+          sender: 'ai',
+          timestamp: new Date(),
+        }]
+      })
+    }
   }
 
   const handleKeyPress = (e) => {

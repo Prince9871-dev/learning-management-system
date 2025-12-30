@@ -32,19 +32,31 @@ export const AuthProvider = ({ children }) => {
   }, [])
 
   const login = async (email, password) => {
-    // Mock login - in real app, this would call an API
+    // For development: Store mock user and token
+    // In production, this should integrate with Firebase Auth to get ID token
+    // The backend expects Firebase ID tokens in Authorization: Bearer <token> header
     const mockUser = {
-      id: '1',
+      uid: 'mock-uid-' + Date.now(),
       email,
       name: email.split('@')[0],
       role: email.includes('admin') ? 'admin' : 'student',
     }
-    const mockToken = 'mock-jwt-token-' + Date.now()
+    // In production, get Firebase ID token: const token = await firebase.auth().currentUser.getIdToken()
+    const mockToken = 'mock-firebase-token-' + Date.now()
 
     localStorage.setItem('user', JSON.stringify(mockUser))
     localStorage.setItem('token', mockToken)
     setUser(mockUser)
     return { success: true, user: mockUser }
+  }
+
+  // Method to set Firebase token directly (for Firebase Auth integration)
+  const setFirebaseToken = (token, userData) => {
+    localStorage.setItem('token', token)
+    if (userData) {
+      localStorage.setItem('user', JSON.stringify(userData))
+      setUser(userData)
+    }
   }
 
   const logout = () => {
@@ -58,6 +70,7 @@ export const AuthProvider = ({ children }) => {
     loading,
     login,
     logout,
+    setFirebaseToken,
     isAuthenticated: !!user,
   }
 

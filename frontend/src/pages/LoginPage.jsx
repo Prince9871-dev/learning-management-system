@@ -72,7 +72,9 @@ const LoginPage = () => {
           </form>
 
           <div className="login-info">
-            <p>Demo: Use any email and password to login</p>
+            <p><strong>Note:</strong> Backend uses Firebase Authentication</p>
+            <p>For production, integrate Firebase Auth SDK to get ID tokens</p>
+            <p>Demo: Use any email and password to login (mock mode)</p>
             <p>Admin: Use email containing "admin" for admin access</p>
           </div>
         </div>

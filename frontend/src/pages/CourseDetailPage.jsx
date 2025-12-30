@@ -3,57 +3,87 @@ import { useParams } from 'react-router-dom'
 import Navbar from '../components/common/Navbar'
 import Footer from '../components/common/Footer'
 import VideoPlayer from '../components/course/VideoPlayer'
+import { courseAPI, activityAPI } from '../services/api'
 import './CourseDetailPage.css'
 
 const CourseDetailPage = () => {
   const { id } = useParams()
   const [course, setCourse] = useState(null)
+  const [videos, setVideos] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [currentVideo, setCurrentVideo] = useState(null)
+  const [hasLoggedActivity, setHasLoggedActivity] = useState(false)
 
   useEffect(() => {
-    // Mock data - in real app, this would fetch from API
-    const mockCourse = {
-      id: id,
-      title: 'Introduction to React',
-      description: 'Learn the fundamentals of React and build your first application. This comprehensive course covers everything from basic concepts to advanced patterns.',
-      instructor: 'John Doe',
-      category: 'Web Development',
-      rating: 4.5,
-      duration: '10h 30m',
-      students: 1250,
-      lessons: [
-        {
-          id: '1',
-          title: 'Getting Started with React',
-          duration: '15:30',
-          videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-        },
-        {
-          id: '2',
-          title: 'Components and Props',
-          duration: '22:45',
-          videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-        },
-        {
-          id: '3',
-          title: 'State Management',
-          duration: '18:20',
-          videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-        },
-      ],
+    const fetchCourse = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        const response = await courseAPI.getById(id)
+        
+        // Backend returns: { success: true, course: {...}, videos: [...] }
+        if (response.data.success) {
+          const courseData = response.data.course
+          const videosData = response.data.videos || []
+          
+          setCourse({
+            id: courseData.id || courseData._id,
+            title: courseData.title,
+            description: courseData.description || '',
+            notesUrl: courseData.notesUrl,
+            createdAt: courseData.createdAt,
+          })
+          
+          // Map YouTube videos to frontend format
+          const formattedVideos = videosData.map((video, index) => ({
+            id: video.videoId || index.toString(),
+            title: video.title || `Video ${index + 1}`,
+            duration: video.duration || 'N/A',
+            videoUrl: `https://www.youtube.com/embed/${video.videoId}`,
+            thumbnail: video.thumbnail,
+          }))
+          
+          setVideos(formattedVideos)
+          if (formattedVideos.length > 0) {
+            setCurrentVideo(formattedVideos[0])
+          }
+        } else {
+          setError('Failed to load course')
+        }
+      } catch (err) {
+        console.error('Error fetching course:', err)
+        setError(err.response?.data?.error || 'Failed to load course. Please try again.')
+      } finally {
+        setLoading(false)
+      }
     }
 
-    setTimeout(() => {
-      setCourse(mockCourse)
-      setCurrentVideo(mockCourse.lessons[0])
-      setLoading(false)
-    }, 500)
+    if (id) {
+      fetchCourse()
+    }
   }, [id])
 
+  // Log activity when video is watched
+  useEffect(() => {
+    const logVideoActivity = async () => {
+      if (currentVideo && !hasLoggedActivity) {
+        try {
+          await activityAPI.logActivity(id, 'VIDEO_VIEW')
+          setHasLoggedActivity(true)
+        } catch (err) {
+          console.error('Error logging video activity:', err)
+          // Don't show error to user, just log it
+        }
+      }
+    }
+
+    logVideoActivity()
+  }, [currentVideo, id, hasLoggedActivity])
+
   const handleVideoProgress = (currentTime, duration) => {
-    // In real app, this would save progress to backend
-    console.log(`Progress: ${((currentTime / duration) * 100).toFixed(2)}%`)
+    // Progress tracking can be added here if needed
+    // For now, activity is logged when video is viewed
   }
 
   if (loading) {
@@ -61,6 +91,16 @@ const CourseDetailPage = () => {
       <div className="course-detail-page">
         <Navbar />
         <div className="course-detail-loading">Loading course...</div>
+        <Footer />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="course-detail-page">
+        <Navbar />
+        <div className="course-detail-error">{error}</div>
         <Footer />
       </div>
     )
@@ -83,12 +123,13 @@ const CourseDetailPage = () => {
         <div className="course-detail-main">
           <div className="course-detail-header">
             <h1 className="course-detail-title">{course.title}</h1>
-            <div className="course-detail-meta">
-              <span>By {course.instructor}</span>
-              <span>⭐ {course.rating}</span>
-              <span>👥 {course.students} students</span>
-              <span>⏱ {course.duration}</span>
-            </div>
+            {course.notesUrl && (
+              <div className="course-detail-meta">
+                <a href={course.notesUrl} target="_blank" rel="noopener noreferrer" className="course-notes-link">
+                  📝 View Notes
+                </a>
+              </div>
+            )}
           </div>
 
           <div className="course-detail-video-section">
@@ -110,21 +151,28 @@ const CourseDetailPage = () => {
         <div className="course-detail-sidebar">
           <div className="course-detail-lessons">
             <h3>Course Content</h3>
-            <div className="course-detail-lessons-list">
-              {course.lessons.map((lesson, index) => (
-                <div
-                  key={lesson.id}
-                  className={`course-detail-lesson ${currentVideo?.id === lesson.id ? 'active' : ''}`}
-                  onClick={() => setCurrentVideo(lesson)}
-                >
-                  <div className="course-detail-lesson-number">{index + 1}</div>
-                  <div className="course-detail-lesson-info">
-                    <div className="course-detail-lesson-title">{lesson.title}</div>
-                    <div className="course-detail-lesson-duration">{lesson.duration}</div>
+            {videos.length === 0 ? (
+              <div className="course-detail-no-videos">No videos available</div>
+            ) : (
+              <div className="course-detail-lessons-list">
+                {videos.map((video, index) => (
+                  <div
+                    key={video.id}
+                    className={`course-detail-lesson ${currentVideo?.id === video.id ? 'active' : ''}`}
+                    onClick={() => {
+                      setCurrentVideo(video)
+                      setHasLoggedActivity(false) // Reset to log activity for new video
+                    }}
+                  >
+                    <div className="course-detail-lesson-number">{index + 1}</div>
+                    <div className="course-detail-lesson-info">
+                      <div className="course-detail-lesson-title">{video.title}</div>
+                      <div className="course-detail-lesson-duration">{video.duration}</div>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

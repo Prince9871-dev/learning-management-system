@@ -3,6 +3,7 @@ import Navbar from '../components/common/Navbar'
 import Footer from '../components/common/Footer'
 import ActivityHeatmap from '../components/activity/ActivityHeatmap'
 import StreakDisplay from '../components/activity/StreakDisplay'
+import { activityAPI } from '../services/api'
 import './ActivityPage.css'
 
 const ActivityPage = () => {
@@ -10,31 +11,44 @@ const ActivityPage = () => {
   const [currentStreak, setCurrentStreak] = useState(0)
   const [longestStreak, setLongestStreak] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
-    // Mock data - in real app, this would fetch from API
-    const generateMockData = () => {
-      const data = []
-      const today = new Date()
-      for (let i = 0; i < 365; i++) {
-        const date = new Date(today)
-        date.setDate(date.getDate() - i)
-        // Random activity count (0-15)
-        const count = Math.floor(Math.random() * 16)
-        data.push({
-          date: date.toISOString().split('T')[0],
-          count,
-        })
+    const fetchActivityData = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        
+        // Fetch heatmap and streaks in parallel
+        const [heatmapResponse, streaksResponse] = await Promise.all([
+          activityAPI.getHeatmap(),
+          activityAPI.getStreaks(),
+        ])
+        
+        // Process heatmap data
+        if (heatmapResponse.data.success && heatmapResponse.data.activity) {
+          // Backend returns: { success: true, activity: [{ date: "2024-01-15", activityCount: 5 }] }
+          const formattedData = heatmapResponse.data.activity.map(item => ({
+            date: item.date,
+            count: item.activityCount || 0,
+          }))
+          setActivityData(formattedData)
+        }
+        
+        // Process streaks data
+        if (streaksResponse.data.success) {
+          setCurrentStreak(streaksResponse.data.currentStreak || 0)
+          setLongestStreak(streaksResponse.data.longestStreak || 0)
+        }
+      } catch (err) {
+        console.error('Error fetching activity data:', err)
+        setError(err.response?.data?.error || 'Failed to load activity data. Please try again.')
+      } finally {
+        setLoading(false)
       }
-      return data.reverse()
     }
 
-    setTimeout(() => {
-      setActivityData(generateMockData())
-      setCurrentStreak(7)
-      setLongestStreak(15)
-      setLoading(false)
-    }, 500)
+    fetchActivityData()
   }, [])
 
   return (
@@ -46,6 +60,8 @@ const ActivityPage = () => {
 
         {loading ? (
           <div className="activity-loading">Loading activity data...</div>
+        ) : error ? (
+          <div className="activity-error">{error}</div>
         ) : (
           <>
             <StreakDisplay currentStreak={currentStreak} longestStreak={longestStreak} />

@@ -38,47 +38,37 @@ api.interceptors.response.use(
   }
 )
 
-// Course API
+// Course API - matches backend routes exactly
 export const courseAPI = {
   getAll: () => api.get('/courses'),
   getById: (id) => api.get(`/courses/${id}`),
-  enroll: (id) => api.post(`/courses/${id}/enroll`),
-  getProgress: (id) => api.get(`/courses/${id}/progress`),
-  updateProgress: (id, data) => api.put(`/courses/${id}/progress`, data),
 }
 
-// Community API
+// Community API - matches backend routes exactly
 export const communityAPI = {
-  getPosts: (params) => api.get('/community/posts', { params }),
-  getPostById: (id) => api.get(`/community/posts/${id}`),
-  createPost: (data) => api.post('/community/posts', data),
-  updatePost: (id, data) => api.put(`/community/posts/${id}`, data),
-  deletePost: (id) => api.delete(`/community/posts/${id}`),
-  vote: (id, type) => api.post(`/community/posts/${id}/vote`, { type }),
-  getComments: (id) => api.get(`/community/posts/${id}/comments`),
-  addComment: (id, data) => api.post(`/community/posts/${id}/comments`, data),
+  getPosts: () => api.get('/community'),
+  createPost: (data) => api.post('/community', data),
+  vote: (postId, voteType) => api.post(`/community/${postId}/vote`, { voteType }),
 }
 
-// Activity API
+// Activity API - matches backend routes exactly
 export const activityAPI = {
-  getActivity: () => api.get('/activity'),
+  getHeatmap: () => api.get('/activity/heatmap'),
   getStreaks: () => api.get('/activity/streaks'),
-  getHeatmap: (year) => api.get(`/activity/heatmap?year=${year}`),
+  logActivity: (topicId, actionType) => api.post('/activity/log', { topicId, actionType }),
 }
 
-// AI API
+// AI API - matches backend routes exactly
 export const aiAPI = {
-  askQuestion: (question) => api.post('/ai/ask', { question }),
-  getChatHistory: () => api.get('/ai/chat-history'),
-  clearHistory: () => api.delete('/ai/chat-history'),
+  askQuestion: (question, context) => api.post('/ai/ask', { question, context }),
 }
 
-// Analytics API (Admin)
+// Analytics API (Admin) - matches backend routes exactly
 export const analyticsAPI = {
-  getDashboard: () => api.get('/admin/analytics/dashboard'),
-  getUsers: (params) => api.get('/admin/users', { params }),
-  getCourses: (params) => api.get('/admin/courses', { params }),
-  getEngagement: () => api.get('/admin/analytics/engagement'),
+  getDAU: (days = 30) => api.get('/analytics/dau', { params: { days } }),
+  getTopics: (limit = 10) => api.get('/analytics/topics', { params: { limit } }),
+  getDonations: () => api.get('/analytics/donations'),
+  getTrending: (limit = 10) => api.get('/analytics/trending', { params: { limit } }),
 }
 
 export default api
